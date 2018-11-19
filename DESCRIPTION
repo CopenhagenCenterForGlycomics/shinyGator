@@ -1,0 +1,8 @@
+Package: shinyGator
+Title: GATOR widgets in Shiny
+Version: 0.0.0.9000
+Authors@R: person("Hiren", "Joshi", email = "hirenj@gmail.com", role = c("aut", "cre"))
+Description: Runs GATOR widgets in Shiny for fancy sequence viewing
+Depends: R (>= 3.3.2)
+License: TBD
+LazyData: true
