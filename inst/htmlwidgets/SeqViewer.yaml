@@ -9,4 +9,4 @@ dependencies:
   - name: renderers
     version: 1.0.0
     src: 'htmlwidgets/renderers'
-    attachment: {'msdata.packed': 'msdata.packed.renderer.js', 'glycodomain.packed': 'glycodomain.packed.renderer.js'}
+    attachment: {'msdata.packed': 'msdata.packed.renderer.js', 'glycodomain.packed': 'glycodomain.packed.renderer.js', 'customdata.packed': 'customdata.packed.renderer.js'}

@@ -13,6 +13,16 @@ const retrieve_uniprot = function(uniprot) {
   });
 };
 
+const session_ready = new Promise( resolve => {
+  $(document).on('shiny:sessioninitialized', resolve);
+});
+
+const notify_sequence = function(el,seq) {
+  if (HTMLWidgets.shinyMode) {
+    Shiny.setInputValue('sequenceChange',seq, { priority: "event"});
+  }
+};
+
 const set_sequence = function(el,uniprot) {
   return retrieve_uniprot(uniprot).then (seq => {
     let viewer = el.querySelector('x-protviewer');
@@ -25,6 +35,9 @@ const set_sequence = function(el,uniprot) {
         for (let track of viewer.querySelectorAll('x-gatortrack')) {
           track.setAttribute('scale',uniprot);
         }
+        session_ready.then( () => {
+          notify_sequence(el,seq);
+        });
         resolve();
       };
       viewer.renderer.bind('sequenceChange',resolver);
@@ -60,12 +73,20 @@ const render_ptm_data = (el,value) => {
   });
 };
 
-const set_uniprot = (el,value) => {
-  let value_uc = value.toUpperCase();
-  set_sequence(el,value_uc).then( () => {
-    render_domains(el,value_uc);
-    render_ptm_data(el,value_uc);
-  });
+const METHODS = {
+  setUniprot: (el,params) => {
+    let value_uc = params.uniprot.toUpperCase();
+    set_sequence(el,value_uc).then( () => {
+      render_domains(el,value_uc);
+      render_ptm_data(el,value_uc);
+    });
+  },
+  showRange: (el,params) => {
+    el.querySelector('x-protviewer').renderer.showResidues(params.min,params.max);
+  },
+  showData: (el,params) => {
+    el.querySelector('x-trackrenderer[track="data"]').data = HTMLWidgets.dataframeToD3(params.dataframe);
+  }
 };
 
 
@@ -109,14 +130,14 @@ HTMLWidgets.widget({
 
         el.querySelector('x-trackrenderer[track="domains"]').setAttribute('src',HTMLWidgets.getAttachmentUrl('renderers', 'glycodomain.packed'));
         el.querySelector('x-trackrenderer[track="ptms"]').setAttribute('src',HTMLWidgets.getAttachmentUrl('renderers', 'msdata.packed'));
-        set_uniprot(el,'Q14118');
+        el.querySelector('x-trackrenderer[track="data"]').setAttribute('src',HTMLWidgets.getAttachmentUrl('renderers', 'customdata.packed'));
 
         if (HTMLWidgets.shinyMode) {
-          for (let method of ['setUniprot']) {
-            Shiny.addCustomMessageHandler(`seqviewer:${method}`, function(message) {
+          for (let method of Object.keys(METHODS)) {
+            Shiny.addCustomMessageHandler(`seqviewer:${method}`, message => {
               var el = document.getElementById(message.id);
               if (el) {
-                set_uniprot(el,message.uniprot);
+                METHODS[method](el,message);
               }
             });
           }

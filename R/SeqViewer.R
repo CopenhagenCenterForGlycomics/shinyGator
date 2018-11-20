@@ -35,6 +35,14 @@ setUniprot <- function(id,uniprot) {
   callJS('setUniprot')
 }
 
+showRange <- function(id,min,max) {
+  callJS('showRange')
+}
+
+showData <- function(id,dataframe) {
+  callJS('showData')
+}
+
 #' Shiny bindings for SeqViewer
 #'
 #' Output and render functions for using SeqViewer within Shiny
