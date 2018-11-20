@@ -12,7 +12,9 @@
     "mascp-jstools": "hirenj/mascp-jstools#nolegacy"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
+    "babel-minify-webpack-plugin": "^0.3.1",
     "babel-preset-env": "^1.6.0",
     "compression-webpack-plugin": "^1.1.11",
     "webpack": "^3.6.0",

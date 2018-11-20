@@ -1,8 +1,8 @@
 const CompressionPlugin = require("compression-webpack-plugin");
+const MinifyPlugin = require("babel-minify-webpack-plugin");
 const path = require('path');
 
 module.exports = {
-  devtool: 'source-map',
   entry: {
     'SeqViewer': [ './js/SeqViewer.js' ],
   },
@@ -11,7 +11,8 @@ module.exports = {
     path: __dirname + '/inst/htmlwidgets'
   },
   plugins: [
-    new CompressionPlugin()
+    new CompressionPlugin(),
+    new MinifyPlugin()
   ],
   devServer: {
    contentBase: path.join(__dirname, "/"),
