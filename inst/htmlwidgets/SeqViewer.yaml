@@ -8,7 +8,5 @@
 dependencies:
   - name: renderers
     version: 1.0.0
-    src:
-      - htmlwidgets/renderers
-    script:
-    stylesheet:
+    src: 'htmlwidgets/renderers'
+    attachment: {'msdata.packed': 'msdata.packed.renderer.js', 'glycodomain.packed': 'glycodomain.packed.renderer.js'}

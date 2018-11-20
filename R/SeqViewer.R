@@ -23,6 +23,18 @@ SeqViewer <- function(message, width = NULL, height = NULL, elementId = NULL) {
   )
 }
 
+callJS <- function(method) {
+  message <- Filter(function(x) !is.symbol(x), as.list(parent.frame(1)))
+  session <- shiny::getDefaultReactiveDomain()
+  method <- paste0("seqviewer:", method)
+  message$method = method
+  session$sendCustomMessage(method, message)
+}
+
+setUniprot <- function(id,uniprot) {
+  callJS('setUniprot')
+}
+
 #' Shiny bindings for SeqViewer
 #'
 #' Output and render functions for using SeqViewer within Shiny
