@@ -13,8 +13,12 @@ const retrieve_uniprot = function(uniprot) {
   });
 };
 
-const session_ready = new Promise( resolve => {
-  $(document).on('shiny:sessioninitialized', resolve);
+const session_ready = new Promise( (resolve,reject) => {
+  if (HTMLWidgets.shinyMode) {
+    $(document).on('shiny:sessioninitialized', resolve);
+  } else {
+    reject();
+  }
 });
 
 const notify_sequence = function(el,seq) {
@@ -73,16 +77,39 @@ const render_ptm_data = (el,value) => {
   });
 };
 
+
+
+const pan_listener = function() {
+  let leftvis = this.renderer.leftVisibleResidue();
+  let rightvis = this.renderer.rightVisibleResidue();
+  if (HTMLWidgets.shinyMode) {
+    Shiny.setInputValue('pan',{ left: leftvis, right: rightvis  }, { priority: "event"});
+  }
+  // Send message back to R
+};
+
+const enable_pan_listener = function(){
+  this.addEventListener('pandone',pan_listener);
+  this.renderer.bind('zoomChange',pan_listener);
+};
+
+
 const METHODS = {
   setUniprot: (el,params) => {
     let value_uc = params.uniprot.toUpperCase();
-    set_sequence(el,value_uc).then( () => {
+    return set_sequence(el,value_uc).then( () => {
       render_domains(el,value_uc);
       render_ptm_data(el,value_uc);
     });
   },
   showRange: (el,params) => {
-    el.querySelector('x-protviewer').renderer.showResidues(params.min,params.max);
+    let viewer = el.querySelector('x-protviewer');
+    viewer.removeEventListener('pandone',viewer.pan_listener);
+    viewer.renderer.unbind('zoomChange',viewer.pan_listener);
+    el.querySelector('x-protviewer').renderer.showResidues(params.min,params.max)
+    .then( () => {
+      enable_pan_listener.bind(viewer)();
+    })
   },
   showData: (el,params) => {
     el.querySelector('x-trackrenderer[track="data"]').data = HTMLWidgets.dataframeToD3(params.dataframe);
@@ -141,6 +168,19 @@ HTMLWidgets.widget({
               }
             });
           }
+
+          enable_pan_listener.bind(viewer)();
+
+        }
+
+        let seqset = Promise.resolve();
+
+        if (params.uniprot) {
+          seqset = METHODS['setUniprot'](el,params);
+        }
+
+        if (params.dataframe) {
+          seqset.then( () => METHODS['showData'](el,params));
         }
 
       },

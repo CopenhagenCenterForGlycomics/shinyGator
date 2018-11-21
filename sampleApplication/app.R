@@ -30,9 +30,13 @@ server <- function(input, output,session) {
     showRange('sequence',input$range[1],input$range[2])
   })
 
+  observeEvent(input$pan,{
+    #updateSliderInput(session,"range",value=c(input$pan$left,input$pan$right),min=1,max=nchar(input$sequenceChange),step=1)
+  })
+
   observeEvent(input$sequenceChange,{
     updateSliderInput(session,"range",value=c(1,nchar(input$sequenceChange)),min=1,max=nchar(input$sequenceChange),step=1)
-    showData('sequence',data.frame(acc=input$uniprot,peptide_start=sample(1:100,50,replace=T),peptide_end=sample(200:300,50,replace=T),composition=rep('HexNAc',10)))
+    showData('sequence',data.frame(peptide_start=sample(1:100,50,replace=T),peptide_end=sample(200:300,50,replace=T),composition=rep('HexNAc',10)))
   })
   observe({
     showData('sequence',input$dataframe)

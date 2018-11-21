@@ -46,8 +46,6 @@ peptides.forEach(function(glycopep,i) {
 	}
 	glycopep.start = start;
 	glycopep.end = end;
-	console.log(start);
-	console.log(end);
 	intervals.push({ "index" : start, "start" : true,  "pep" : i });
 	intervals.push({ "index" : end, "start" : false , "pep" : i });
 });
@@ -182,6 +180,7 @@ intervals.forEach(function(interval) {
 
 Object.keys(return_data).forEach( function(acc) {
 	return_data[acc] = peptide_lines[acc].concat(ambiguous_shapes[acc]).concat(return_data[acc]);
+	return_data[acc].forEach( item => item.track = 'data' );
 });
 
 return return_data;

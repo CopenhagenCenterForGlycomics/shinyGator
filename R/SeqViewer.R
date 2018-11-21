@@ -5,7 +5,7 @@
 #' @import htmlwidgets
 #'
 #' @export
-SeqViewer <- function(message, width = NULL, height = NULL, elementId = NULL) {
+SeqViewer <- function(message=list(), width = NULL, height = NULL, elementId = NULL) {
 
   # forward options using x
   x = list(
