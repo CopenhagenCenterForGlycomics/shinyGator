@@ -36,10 +36,10 @@ server <- function(input, output,session) {
 
   observeEvent(input$sequenceChange,{
     updateSliderInput(session,"range",value=c(1,nchar(input$sequenceChange)),min=1,max=nchar(input$sequenceChange),step=1)
-    showData('sequence',data.frame(peptide_start=sample(1:100,50,replace=T),peptide_end=sample(200:300,50,replace=T),composition=rep('HexNAc',10)))
+    addTrack('sequence',data.frame(peptide_start=sample(1:100,50,replace=T),peptide_end=sample(200:300,50,replace=T),composition=rep('HexNAc',10)))
   })
   observe({
-    showData('sequence',input$dataframe)
+    addTrack('sequence',input$dataframe)
   })
   observe({
     setUniprot('sequence',input$uniprot)
