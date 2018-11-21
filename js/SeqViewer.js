@@ -79,18 +79,21 @@ const render_ptm_data = (el,value) => {
 
 
 
-const pan_listener = function() {
-  let leftvis = this.renderer.leftVisibleResidue();
-  let rightvis = this.renderer.rightVisibleResidue();
+const pan_listener = function(viewer) {
+  console.log('Pan listener',viewer);
+  let leftvis = viewer.renderer.leftVisibleResidue();
+  let rightvis = viewer.renderer.rightVisibleResidue();
   if (HTMLWidgets.shinyMode) {
     Shiny.setInputValue('pan',{ left: leftvis, right: rightvis  }, { priority: "event"});
   }
   // Send message back to R
 };
 
-const enable_pan_listener = function(){
-  this.addEventListener('pandone',pan_listener);
-  this.renderer.bind('zoomChange',pan_listener);
+const enable_pan_listener = function(viewer){
+  let listener = pan_listener.bind(null,viewer);
+  viewer.addEventListener('pandone',listener);
+  viewer.renderer.bind('zoomChange',listener);
+  return listener;
 };
 
 
@@ -108,7 +111,7 @@ const METHODS = {
     viewer.renderer.unbind('zoomChange',viewer.pan_listener);
     el.querySelector('x-protviewer').renderer.showResidues(params.min,params.max)
     .then( () => {
-      enable_pan_listener.bind(viewer)();
+      viewer.pan_listener = enable_pan_listener(viewer);
     })
   },
   showData: (el,params) => {
@@ -141,6 +144,9 @@ HTMLWidgets.widget({
 
         if (params.interactive) {
           viewer.setAttribute('interactive','');
+          viewer.removeAttribute('selecting');
+        } else {
+          viewer.removeAttribute('interactive');
         }
 
         if ( ! params.ptms ) {
@@ -169,8 +175,8 @@ HTMLWidgets.widget({
             });
           }
 
-          enable_pan_listener.bind(viewer)();
-
+          viewer.pan_listener = enable_pan_listener(viewer);
+          console.log('Bound pan events');
         }
 
         let seqset = Promise.resolve();

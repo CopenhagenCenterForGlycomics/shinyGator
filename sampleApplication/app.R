@@ -20,7 +20,7 @@ ui <- fluidPage(
    mainPanel(
      textInput("uniprot", "UniProtID", "Q14112"),
      sliderInput("range", "Amino acids", 1, 1, c(1,1), step = 1, round = FALSE, ticks = TRUE, animate = FALSE),
-     SeqViewer(list(ptms=T,domains=T),elementId="sequence")
+     SeqViewer(list(ptms=T,domains=T,interactive=T),elementId="sequence")
    )
 )
 
@@ -31,7 +31,7 @@ server <- function(input, output,session) {
   })
 
   observeEvent(input$pan,{
-    #updateSliderInput(session,"range",value=c(input$pan$left,input$pan$right),min=1,max=nchar(input$sequenceChange),step=1)
+    updateSliderInput(session,"range",value=c(input$pan$left,input$pan$right),min=1,max=nchar(input$sequenceChange),step=1)
   })
 
   observeEvent(input$sequenceChange,{
