@@ -114,8 +114,14 @@ const METHODS = {
       viewer.pan_listener = enable_pan_listener(viewer);
     })
   },
-  showData: (el,params) => {
-    el.querySelector('x-trackrenderer[track="data"]').data = HTMLWidgets.dataframeToD3(params.dataframe);
+  addTrack: (el,params) => {
+    let datapoints = HTMLWidgets.dataframeToD3(params.dataframe);
+    if (params.track) {
+      datapoints.forEach( point => point.track = params.track );
+    } else {
+      params.track = 'data';
+    }
+    el.querySelector(`x-trackrenderer[track="${params.track}"]`).data = datapoints;
   }
 };
 
@@ -176,7 +182,6 @@ HTMLWidgets.widget({
           }
 
           viewer.pan_listener = enable_pan_listener(viewer);
-          console.log('Bound pan events');
         }
 
         let seqset = Promise.resolve();
@@ -186,7 +191,27 @@ HTMLWidgets.widget({
         }
 
         if (params.dataframe) {
-          seqset.then( () => METHODS['showData'](el,params));
+          seqset.then( () => METHODS['addTrack'](el,params));
+        }
+
+        if (input.api) {
+          input.api.map(message => {
+            message.method = message.method.split(':')[1];
+            return message;
+          }).sort( (a,b) => {
+            if (a.method == 'setUniprot') {
+              return -1;
+            }
+            return 1;
+          }).forEach( message => {
+            if (message.method == 'setUniprot') {
+              seqset = seqset.then( () => {
+                return METHODS[message.method](el,message);                
+              });
+            } else {
+              seqset.then( () => METHODS[message.method](el,message))
+            }
+          });
         }
 
       },

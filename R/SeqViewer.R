@@ -12,8 +12,10 @@ SeqViewer <- function(message=list(), width = NULL, height = NULL, elementId = N
     message = message
   )
 
+  x$api <- list()
+
   # create widget
-  htmlwidgets::createWidget(
+  widget = htmlwidgets::createWidget(
     name = 'SeqViewer',
     x,
     width = width,
@@ -28,7 +30,16 @@ callJS <- function(method) {
   session <- shiny::getDefaultReactiveDomain()
   method <- paste0("seqviewer:", method)
   message$method = method
-  session$sendCustomMessage(method, message)
+
+  input_id = message$id
+
+  if ( is.null(session) || methods::is(input_id,'SeqViewer') ) {
+    message$id = NULL
+    input_id$x$api = c( input_id$x$api, list(message))
+  } else {
+    session$sendCustomMessage(method, message)
+  }
+  input_id
 }
 
 setUniprot <- function(id,uniprot) {
@@ -39,8 +50,8 @@ showRange <- function(id,min,max) {
   callJS('showRange')
 }
 
-showData <- function(id,dataframe) {
-  callJS('showData')
+addTrack <- function(id,dataframe,track='data') {
+  callJS('addTrack')
 }
 
 #' Shiny bindings for SeqViewer

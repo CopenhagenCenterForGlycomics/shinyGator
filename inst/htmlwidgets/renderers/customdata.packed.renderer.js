@@ -88,7 +88,7 @@ var render_peptide = function(peptide,depth) {
 	//var depth = 0;
 	var base_offset = 12+4*(-2+depth);
 
-	var pep_line = { "aa": peptide.start, "type" : "box" , "width" : (peptide.end - peptide.start), "options" : { "offset" : base_offset, "height_scale" : 0.1, "fill" : "#999", "merge" : false  }}
+	var pep_line = { "track" : peptide.track, "aa": peptide.start, "type" : "box" , "width" : (peptide.end - peptide.start), "options" : { "offset" : base_offset, "height_scale" : 0.1, "fill" : "#999", "merge" : false  }}
 
 	peptide_lines[peptide.acc].push(pep_line);
 
@@ -98,7 +98,7 @@ var render_peptide = function(peptide,depth) {
 			return;
 		}
 		seen_sites[ peptide_key ] = true;
-		ambiguous_shapes[peptide.acc].push({ "aa" : Math.floor(0.5*peptide.start + 0.5*peptide.end), "type" : "marker" , "options" : { "content" : guess_composition(peptide.composition), "stretch": true, "height" : 10, "width": 3, "fill" : "none", "text_fill" : "#555", "border" : "#ddd", "no_tracer" : true, "bare_element" : false, "zoom_level" : "text", "offset" : base_offset + 2.5 }});
+		ambiguous_shapes[peptide.acc].push({ "track" : peptide.track, "aa" : Math.floor(0.5*peptide.start + 0.5*peptide.end), "type" : "marker" , "options" : { "content" : guess_composition(peptide.composition), "stretch": true, "height" : 10, "width": 3, "fill" : "none", "text_fill" : "#555", "border" : "#ddd", "no_tracer" : true, "bare_element" : false, "zoom_level" : "text", "offset" : base_offset + 2.5 }});
 	}
 	var has_site = false;
 	(peptide.sites || []).forEach(function renderSite(site_block) {
@@ -137,7 +137,7 @@ var render_peptide = function(peptide,depth) {
 			seen_sites[site+composition] = true;
 		}
 
-		let rendered_block = { "aa" : site, "type" : "marker" , "options" : { "content" :  '#sugar_'+composition , "fill" : "none", "text_fill" : "#f00", "border" : "none", "height": 8, "offset" : base_offset - 2.5, "bare_element" : true }};
+		let rendered_block = { "track" : peptide.track, "aa" : site, "type" : "marker" , "options" : { "content" :  '#sugar_'+composition , "fill" : "none", "text_fill" : "#f00", "border" : "none", "height": 8, "offset" : base_offset - 2.5, "bare_element" : true }};
 
 
 		if (composition.indexOf(')') < 0 && (composition.match(/\d/) || []).length < 1) {
@@ -180,8 +180,13 @@ intervals.forEach(function(interval) {
 
 Object.keys(return_data).forEach( function(acc) {
 	return_data[acc] = peptide_lines[acc].concat(ambiguous_shapes[acc]).concat(return_data[acc]);
-	return_data[acc].forEach( item => item.track = 'data' );
+	return_data[acc].forEach( obj => {
+		if ( ! obj.track ) {
+			delete obj.track;
+		}
+	});
 });
+
 
 return return_data;
 }
