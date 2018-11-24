@@ -54,6 +54,21 @@ addTrack <- function(id,dataframe,track='data') {
   callJS('addTrack')
 }
 
+peptides <- function(id,data,mapping,track='data') {
+  dataframe = data.frame(
+    peptide_start=with(data,eval(mapping[['peptide.start']])),
+    peptide_end=with(data,eval(mapping[['peptide.end']])),
+    composition=with(data,eval(mapping[['composition']]))
+  )
+  callJS('addTrack')
+}
+
+sites <- function(id,data,mapping,track='data') {
+  dataframe = `class<-`(list(sites=list(with(data, mapply(list, eval(mapping[['sites']]),eval(mapping[['composition']]), SIMPLIFY =F)))), 'data.frame')
+  callJS('addTrack')
+}
+
+
 #' Shiny bindings for SeqViewer
 #'
 #' Output and render functions for using SeqViewer within Shiny
