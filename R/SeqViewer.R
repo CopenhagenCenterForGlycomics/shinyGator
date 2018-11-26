@@ -54,12 +54,44 @@ addTrack <- function(id,dataframe,track='data') {
   callJS('addTrack')
 }
 
+compact = function(l) {
+  Filter(Negate(is.null), l)
+}
+
+empty = function (df) {
+    (is.null(df) || nrow(df) == 0 || ncol(df) == 0)
+}
+
+use_default_aes = function(default,data) {
+  missing_aes <- setdiff(names(default), names(data))
+
+  missing_eval <- lapply(default[missing_aes], rlang::eval_tidy)
+
+  # Needed for geoms with defaults set to NULL (e.g. GeomSf)
+
+  missing_eval <- compact(missing_eval)
+
+  if (empty(data)) {
+    data <- as.data.frame(missing_eval)
+  } else {
+    data[names(missing_eval)] <- missing_eval
+  }
+
+  data
+}
+
+
 peptides <- function(id,data,mapping,track='data') {
-  dataframe = data.frame(
-    peptide_start=with(data,eval(mapping[['peptide.start']])),
-    peptide_end=with(data,eval(mapping[['peptide.end']])),
-    composition=with(data,eval(mapping[['composition']]))
-  )
+  default_aes = aes(colour = "black", size = 1, alpha = NA)
+  dataframe = setNames(do.call('data.frame',lapply( names(mapping), function(x) with(data,eval(mapping[[x]])) )),names(mapping))
+
+  if ('peptide.start' %in% names(dataframe)) {
+    dataframe$peptide_start = dataframe$peptide.start
+  }
+  if ('peptide.end' %in% names(dataframe)) {
+    dataframe$peptide_end = dataframe$peptide.end
+  }
+  dataframe = use_default_aes(default_aes,dataframe)
   callJS('addTrack')
 }
 

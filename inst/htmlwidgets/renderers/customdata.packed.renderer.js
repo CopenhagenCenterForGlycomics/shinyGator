@@ -87,8 +87,7 @@ var seen_sites = {};
 var render_peptide = function(peptide,depth) {
 	//var depth = 0;
 	var base_offset = 12+4*(-2+depth);
-
-	var pep_line = { "track" : peptide.track, "aa": peptide.start, "type" : "box" , "width" : (peptide.end - peptide.start), "options" : { "offset" : base_offset, "height_scale" : 0.1, "fill" : "#999", "merge" : false  }}
+	var pep_line = { "track" : peptide.track, "aa": peptide.start, "type" : "box" , "width" : (peptide.end - peptide.start), "options" : { "offset" : base_offset, "opacity" : peptide.alpha ? peptide.alpha : 1, "height_scale" : peptide.size ? peptide.size * 0.1 : 0.1, "fill" : peptide.colour ? peptide.colour : '#999', "merge" : false  }}
 
 	peptide_lines[peptide.acc].push(pep_line);
 
