@@ -83,7 +83,7 @@ use_default_aes = function(default,data) {
 
 peptides <- function(id,data,mapping,track='data') {
   default_aes = aes(colour = "black", size = 1, alpha = NA)
-  dataframe = setNames(do.call('data.frame',lapply( names(mapping), function(x) with(data,eval(mapping[[x]])) )),names(mapping))
+  dataframe = as.data.frame(lapply(mapping, rlang::eval_tidy, data = data))
 
   if ('peptide.start' %in% names(dataframe)) {
     dataframe$peptide_start = dataframe$peptide.start
