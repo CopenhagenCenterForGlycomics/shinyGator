@@ -23,7 +23,8 @@ const session_ready = new Promise( (resolve,reject) => {
 
 const notify_sequence = function(el,seq) {
   if (HTMLWidgets.shinyMode) {
-    Shiny.setInputValue('sequenceChange',seq, { priority: "event"});
+    let el_id = el.getAttribute('id');
+    Shiny.setInputValue(`sequenceChange_${el_id}`,seq, { priority: "event"});
   }
 };
 
@@ -81,10 +82,11 @@ const render_ptm_data = (el,value) => {
 
 const pan_listener = function(viewer) {
   console.log('Pan listener',viewer);
+  let el_id = viewer.parentNode.getAttribute('id');
   let leftvis = viewer.renderer.leftVisibleResidue();
   let rightvis = viewer.renderer.rightVisibleResidue();
   if (HTMLWidgets.shinyMode) {
-    Shiny.setInputValue('pan',{ left: leftvis, right: rightvis  }, { priority: "event"});
+    Shiny.setInputValue('pan_${el_id}',{ left: leftvis, right: rightvis  }, { priority: "event"});
   }
   // Send message back to R
 };
@@ -107,6 +109,9 @@ const METHODS = {
   },
   showRange: (el,params) => {
     let viewer = el.querySelector('x-protviewer');
+    if ( ! viewer.renderer.sequence ) {
+      return;
+    }
     viewer.removeEventListener('pandone',viewer.pan_listener);
     viewer.renderer.unbind('zoomChange',viewer.pan_listener);
     el.querySelector('x-protviewer').renderer.showResidues(params.min,params.max)
@@ -144,6 +149,10 @@ HTMLWidgets.widget({
           let new_viewer = tmpl.content.cloneNode(true);
           el.appendChild(new_viewer);
           viewer = el.getElementsByTagName('x-protviewer').protview;
+          viewer.setAttribute('id','protviewer-'+el.getAttribute('id'));
+          for (let renderer of el.querySelectorAll('x-trackrenderer')) {
+            renderer.setAttribute('renderer','protviewer-'+el.getAttribute('id'));
+          }
         }
 
         let params = input.message;
