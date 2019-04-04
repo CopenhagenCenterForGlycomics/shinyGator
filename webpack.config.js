@@ -1,5 +1,5 @@
 const CompressionPlugin = require("compression-webpack-plugin");
-const MinifyPlugin = require("babel-minify-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -12,7 +12,13 @@ module.exports = {
   },
   plugins: [
     new CompressionPlugin(),
-    new MinifyPlugin()
+    new TerserPlugin({
+      parallel: true,
+      terserOptions: {
+        ecma: 6,
+      },
+      sourceMap: true,
+    })
   ],
   devServer: {
    contentBase: path.join(__dirname, "/"),
@@ -26,9 +32,10 @@ module.exports = {
         loader: 'babel-loader',
         options: {
           presets: [
-            ['env', {
+            ['@babel/preset-env', {
               modules: false,
-              useBuiltIns: true,
+              corejs: "core-js@2",
+              useBuiltIns: 'entry',
               targets: {
                 browsers: [
                   'Chrome >= 60',

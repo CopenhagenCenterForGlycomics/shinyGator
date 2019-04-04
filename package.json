@@ -12,14 +12,14 @@
     "mascp-jstools": "hirenj/mascp-jstools#nolegacy"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
-    "babel-minify-webpack-plugin": "^0.3.1",
-    "babel-preset-env": "^1.6.0",
-    "compression-webpack-plugin": "^1.1.11",
-    "webpack": "^3.6.0",
-    "webpack-cli": "^1",
-    "webpack-dev-server": "^2.11.2"
+    "@babel/core": "^7.4.3",
+    "babel-loader": "^8.0.5",
+    "@babel/preset-env": "^7.0.0",
+    "compression-webpack-plugin": "^2.0.0",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.2.1",
+    "babel-minify-webpack-plugin": "^0.3.1"
   },
   "browserslist": [
     "> 1%",
